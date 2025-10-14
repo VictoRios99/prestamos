@@ -1,0 +1,321 @@
+<div class="dashboard-container">
+  <h1>Dashboard del Sistema</h1>
+
+  @if (stats && !loading) {
+    <!-- Métricas Principales -->
+    <div class="main-stats-grid">
+      <mat-card class="stat-card money-lent">
+        <mat-card-content>
+          <div class="stat-icon">
+            <mat-icon>account_balance_wallet</mat-icon>
+          </div>
+          <div class="stat-info">
+            <h3>Dinero Prestado</h3>
+            <p class="stat-value">{{ stats.dineroRestado | currency:'MXN':'symbol':'1.0-0' }}</p>
+            <small class="stat-subtitle">Total acumulado</small>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stat-card capital-recovered">
+        <mat-card-content>
+          <div class="stat-icon">
+            <mat-icon>trending_down</mat-icon>
+          </div>
+          <div class="stat-info">
+            <h3>Capital Recuperado</h3>
+            <p class="stat-value">{{ stats.capitalRecuperado | currency:'MXN':'symbol':'1.0-0' }}</p>
+            <small class="stat-subtitle">{{ getRecoveryPercentage() }}% del total</small>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stat-card interest-collected">
+        <mat-card-content>
+          <div class="stat-icon">
+            <mat-icon>trending_up</mat-icon>
+          </div>
+          <div class="stat-info">
+            <h3>Interés Recabado</h3>
+            <p class="stat-value">{{ stats.interesRecabado | currency:'MXN':'symbol':'1.0-0' }}</p>
+            <small class="stat-subtitle">Ganancias por interés</small>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stat-card extra-charges">
+        <mat-card-content>
+          <div class="stat-icon">
+            <mat-icon>add_circle</mat-icon>
+          </div>
+          <div class="stat-info">
+            <h3>Cargos Extras Recaudados</h3>
+            <p class="stat-value">{{ stats.cargosExtrasRecaudados | currency:'MXN':'symbol':'1.0-0' }}</p>
+            <small class="stat-subtitle">Cargos adicionales</small>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stat-card total-collected">
+        <mat-card-content>
+          <div class="stat-icon">
+            <mat-icon>account_balance</mat-icon>
+          </div>
+          <div class="stat-info">
+            <h3>Total Recaudado</h3>
+            <p class="stat-value">{{ getTotalCollected() | currency:'MXN':'symbol':'1.0-0' }}</p>
+            <small class="stat-subtitle">Capital + Interés + Extras</small>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stat-card capsula-collected">
+        <mat-card-content>
+          <div class="stat-icon">
+            <mat-icon>schedule</mat-icon>
+          </div>
+          <div class="stat-info">
+            <h3>Total Recaudado Cápsula</h3>
+            <p class="stat-value">{{ stats.totalRecaudadoCapsula | currency:'MXN':'symbol':'1.0-0' }}</p>
+            <small class="stat-subtitle">Préstamos a plazo fijo</small>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stat-card indefinido-collected">
+        <mat-card-content>
+          <div class="stat-icon">
+            <mat-icon>all_inclusive</mat-icon>
+          </div>
+          <div class="stat-info">
+            <h3>Total Recaudado Indefinido</h3>
+            <p class="stat-value">{{ stats.totalRecaudadoIndefinido | currency:'MXN':'symbol':'1.0-0' }}</p>
+            <small class="stat-subtitle">Préstamos sin plazo definido</small>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stat-card capital-transit">
+        <mat-card-content>
+          <div class="stat-icon">
+            <mat-icon>sync</mat-icon>
+          </div>
+          <div class="stat-info">
+            <h3>Capital en Tránsito</h3>
+            <p class="stat-value">{{ stats.capitalEnTransito | currency:'MXN':'symbol':'1.0-0' }}</p>
+            <small class="stat-subtitle">Pendiente de cobro</small>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stat-card monthly-interest">
+        <mat-card-content>
+          <div class="stat-icon">
+            <mat-icon>calendar_today</mat-icon>
+          </div>
+          <div class="stat-info">
+            <h3>Interés Mensual</h3>
+            <p class="stat-value">{{ stats.intersesMensual | currency:'MXN':'symbol':'1.0-0' }}</p>
+            <small class="stat-subtitle">{{ getCurrentMonth() }}</small>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stat-card overdue-loans warn">
+        <mat-card-content>
+          <div class="stat-icon">
+            <mat-icon>warning</mat-icon>
+          </div>
+          <div class="stat-info">
+            <h3>Préstamos Vencidos</h3>
+            <p class="stat-value">{{ stats.prestamosVencidos }}</p>
+            <small class="stat-subtitle">{{ stats.montoVencido | currency:'MXN':'symbol':'1.0-0' }} en mora</small>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Estadísticas Secundarias -->
+    <div class="secondary-stats">
+      <mat-card>
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon>assessment</mat-icon>
+            Resumen General
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="summary-grid">
+            <div class="summary-item">
+              <span class="summary-label">Total de Préstamos:</span>
+              <strong class="summary-value">{{ stats.totalPrestamos }}</strong>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">Préstamos Activos:</span>
+              <strong class="summary-value text-primary">{{ stats.prestamosActivos }}</strong>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">Préstamos Completados:</span>
+              <strong class="summary-value text-success">{{ stats.prestamosCompletados }}</strong>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">Tasa de Recuperación:</span>
+              <strong class="summary-value text-info">{{ getRecoveryPercentage() }}%</strong>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Alertas y Préstamos Críticos -->
+    @if (stats.prestamosVencidos > 0) {
+      <div class="alerts-section">
+        <mat-card class="alert-card">
+          <mat-card-header>
+            <mat-card-title class="text-danger">
+              <mat-icon>notification_important</mat-icon>
+              Préstamos que Requieren Atención
+            </mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="alert-content">
+              <div class="alert-summary">
+                <p><strong>{{ stats.prestamosVencidos }}</strong> préstamos vencidos por un total de <strong>{{ stats.montoVencido | currency:'MXN':'symbol':'1.0-0' }}</strong></p>
+              </div>
+              
+              @if (stats.prestamosVencidosDetalle && stats.prestamosVencidosDetalle.length > 0) {
+                <div class="overdue-list">
+                  <h4>Préstamos Vencidos:</h4>
+                  <div class="overdue-items">
+                    @for (loan of stats.prestamosVencidosDetalle.slice(0, 5); track loan.id) {
+                      <div class="overdue-item">
+                        <div class="overdue-customer">
+                          <strong>{{ loan.customer }}</strong>
+                          <small>#{{ loan.id }}</small>
+                        </div>
+                        <div class="overdue-amount">
+                          {{ loan.currentBalance | currency:'MXN':'symbol':'1.0-0' }}
+                        </div>
+                        <div class="overdue-days">
+                          <span class="days-badge">{{ loan.daysSinceLastPayment }} días</span>
+                        </div>
+                      </div>
+                    }
+                    @if (stats.prestamosVencidosDetalle.length > 5) {
+                      <div class="more-items">
+                        <small>y {{ stats.prestamosVencidosDetalle.length - 5 }} más...</small>
+                      </div>
+                    }
+                  </div>
+                </div>
+              }
+              
+              <div class="alert-actions">
+                <button mat-raised-button color="warn" (click)="viewOverdueLoans()">
+                  <mat-icon>list</mat-icon>
+                  Ver Todos los Vencidos
+                </button>
+                <button mat-button (click)="generateOverdueReport()">
+                  <mat-icon>download</mat-icon>
+                  Generar Reporte
+                </button>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    }
+
+    <!-- Préstamos por Vencer -->
+    @if (stats.prestamosPorVencer && stats.prestamosPorVencer.length > 0) {
+      <div class="warning-section">
+        <mat-card class="warning-card">
+          <mat-card-header>
+            <mat-card-title class="text-warning">
+              <mat-icon>schedule</mat-icon>
+              Próximos a Vencer
+            </mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="upcoming-list">
+              @for (loan of stats.prestamosPorVencer.slice(0, 3); track loan.id) {
+                <div class="upcoming-item">
+                  <div class="upcoming-customer">
+                    <strong>{{ loan.customer }}</strong>
+                    <small>Pago esperado: {{ loan.monthlyPayment | currency:'MXN':'symbol':'1.0-0' }}</small>
+                  </div>
+                  <div class="upcoming-days">
+                    <span class="upcoming-badge">{{ loan.daysSinceLastPayment }} días</span>
+                  </div>
+                </div>
+              }
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    }
+
+    <!-- Gráfico de Rendimiento -->
+    <div class="performance-section">
+      <mat-card>
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon>show_chart</mat-icon>
+            Indicadores de Rendimiento
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="performance-grid">
+            <div class="performance-item">
+              <div class="performance-chart">
+                <div class="chart-circle" [style.background]="getPerformanceColor('recovery')">
+                  <span class="chart-percentage">{{ getRecoveryPercentage() }}%</span>
+                </div>
+                <p class="chart-label">Tasa de Recuperación</p>
+              </div>
+            </div>
+            
+            <div class="performance-item">
+              <div class="performance-chart">
+                <div class="chart-circle" [style.background]="getPerformanceColor('punctuality')">
+                  <span class="chart-percentage">{{ getPunctualityPercentage() }}%</span>
+                </div>
+                <p class="chart-label">Puntualidad de Pagos</p>
+              </div>
+            </div>
+            
+            <div class="performance-item">
+              <div class="performance-chart">
+                <div class="chart-circle" [style.background]="getPerformanceColor('profit')">
+                  <span class="chart-percentage">{{ getProfitMargin() }}%</span>
+                </div>
+                <p class="chart-label">Margen de Ganancia</p>
+              </div>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+
+  }
+
+  @if (loading) {
+    <div class="loading-container">
+      <mat-spinner diameter="60"></mat-spinner>
+      <p>Cargando estadísticas...</p>
+    </div>
+  }
+
+  @if (!loading && !stats) {
+    <div class="error-container">
+      <mat-icon>error_outline</mat-icon>
+      <h3>Error al cargar el dashboard</h3>
+      <p>No se pudieron obtener las estadísticas del sistema</p>
+      <button mat-raised-button color="primary" (click)="loadDashboard()">
+        <mat-icon>refresh</mat-icon>
+        Reintentar
+      </button>
+    </div>
+  }
+</div>

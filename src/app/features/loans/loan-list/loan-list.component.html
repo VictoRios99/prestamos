@@ -1,0 +1,189 @@
+<div class="loans-container">
+  <div class="header">
+    <h1>Préstamos</h1>
+    <div class="header-actions">
+      <button mat-raised-button color="accent" (click)="refreshLoans()" [disabled]="loading">
+        <mat-icon>refresh</mat-icon>
+        Actualizar
+      </button>
+      <button mat-raised-button color="primary" (click)="openDialog()">
+        <mat-icon>add</mat-icon>
+        Nuevo Préstamo
+      </button>
+    </div>
+  </div>
+
+  <!-- Filtros y estadísticas rápidas -->
+  <mat-card class="stats-card">
+    <mat-card-content>
+      <div class="quick-stats">
+        <div class="stat-item">
+          <span class="stat-label">Total:</span>
+          <span class="stat-value">{{loans.length}}</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Al día:</span>
+          <span class="stat-value text-success">{{getCurrentLoansCount()}}</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Vencidos:</span>
+          <span class="stat-value text-danger">{{getOverdueLoansCount()}}</span>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card>
+    <mat-card-content>
+      <div class="table-container">
+        <table mat-table [dataSource]="loans" class="loans-table">
+          
+          <ng-container matColumnDef="id">
+            <th mat-header-cell *matHeaderCellDef>ID</th>
+            <td mat-cell *matCellDef="let element">{{formatLoanId(element.id)}}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="customer">
+            <th mat-header-cell *matHeaderCellDef>Cliente</th>
+            <td mat-cell *matCellDef="let element">
+              @if (element.customer) {
+                <div class="customer-info">
+                  <strong>{{element.customer.firstName}} {{element.customer.lastName}}</strong>
+                  <br>
+                  <small class="text-muted">{{element.customer.email}}</small>
+                </div>
+              }
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="loanDate">
+            <th mat-header-cell *matHeaderCellDef>Fecha Préstamo</th>
+            <td mat-cell *matCellDef="let element">
+              <div class="date-info">
+                {{element.loanDate | date:'dd/MM/yyyy'}}
+                <br>
+                <small class="text-muted">{{getDaysAgo(element.loanDate)}} días</small>
+              </div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="amount">
+            <th mat-header-cell *matHeaderCellDef>Monto Original</th>
+            <td mat-cell *matCellDef="let element">
+              <strong>{{element.amount | currency:'MXN':'symbol':'1.0-0'}}</strong>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="currentBalance">
+            <th mat-header-cell *matHeaderCellDef>Saldo Actual</th>
+            <td mat-cell *matCellDef="let element">
+              <div class="balance-info">
+                <strong [ngClass]="getBalanceClass(element)">
+                  {{element.currentBalance | currency:'MXN':'symbol':'1.0-0'}}
+                </strong>
+                <br>
+                <small class="text-muted">
+                  Progreso: {{getPaymentProgress(element)}}%
+                </small>
+              </div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="paymentInfo">
+            <th mat-header-cell *matHeaderCellDef>Info de Pagos</th>
+            <td mat-cell *matCellDef="let element">
+              <div class="payment-info">
+                @if (element.term) {
+                  <div>
+                    <strong>Plazo:</strong> {{element.term}} 
+                    @if (element.modality) {
+                      {{element.modality}}
+                    } @else {
+                      quincenas <!-- Fallback for old data or if modality is not set -->
+                    }
+                  </div>
+                  <div><strong>Progreso:</strong> {{element.monthsPaid || 0}} / {{element.term}}</div>
+                } @else {
+                  <div><strong>Plazo:</strong> Indefinido</div>
+                  <div><strong>Progreso:</strong> {{element.monthsPaid || 0}}/Indefinido</div>
+                }
+                <div class="last-payment">
+                  <strong>Último pago:</strong>
+                  @if (element.lastPaymentDate) {
+                    <span>{{element.lastPaymentDate | date:'dd/MM/yyyy'}}</span>
+                    <br><small>({{getDaysSinceLastPayment(element)}} días)</small>
+                  } @else {
+                    <span class="text-warning">Sin pagos</span>
+                  }
+                </div>
+              </div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef>Estado</th>
+            <td mat-cell *matCellDef="let element">
+              <mat-chip [ngClass]="getStatusClass(element)">
+                {{getStatusText(element)}}
+              </mat-chip>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Acciones</th>
+            <td mat-cell *matCellDef="let element">
+              <button mat-icon-button [matMenuTriggerFor]="menu" matTooltip="Acciones">
+                <mat-icon>more_vert</mat-icon>
+              </button>
+              <mat-menu #menu="matMenu">
+                <button mat-menu-item (click)="viewLoanDetails(element)">
+                  <mat-icon>visibility</mat-icon>
+                  <span>Ver Detalles Completos</span>
+                </button>
+                <button mat-menu-item (click)="viewPaymentHistory(element)">
+                  <mat-icon>history</mat-icon>
+                  <span>Historial de Pagos</span>
+                </button>
+                <mat-divider></mat-divider>
+                <button mat-menu-item (click)="editLoan(element)" [disabled]="element.monthsPaid > 0">
+                  <mat-icon>edit</mat-icon>
+                  <span>Editar</span>
+                </button>
+                <button mat-menu-item (click)="deleteLoan(element)" 
+                        [disabled]="element.monthsPaid > 0 || element.status === 'PAID'"
+                        class="text-danger">
+                  <mat-icon>delete</mat-icon>
+                  <span>Eliminar</span>
+                </button>
+              </mat-menu>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;" 
+              [ngClass]="getRowClass(row)"
+              [matTooltip]="getRowTooltip(row)"></tr>
+        </table>
+
+        @if (loading) {
+          <div class="loading-container">
+            <mat-spinner></mat-spinner>
+            <p>Cargando préstamos...</p>
+          </div>
+        }
+
+        @if (!loading && loans.length === 0) {
+          <div class="empty-state">
+            <mat-icon>account_balance_wallet</mat-icon>
+            <h3>No hay préstamos registrados</h3>
+            <p>Comienza creando un nuevo préstamo</p>
+            <button mat-raised-button color="primary" (click)="openDialog()">
+              <mat-icon>add</mat-icon>
+              Crear Primer Préstamo
+            </button>
+          </div>
+        }
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

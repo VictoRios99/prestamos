@@ -1,0 +1,98 @@
+<h2>Detalles del Préstamo #{{loan?.id}}</h2>
+
+<div>
+  @if (loan) {
+    <div class="loan-info">
+      <mat-card>
+        <mat-card-header>
+          <mat-card-title>Información General</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="info-grid">
+            <div class="info-item">
+              <strong>Cliente:</strong>
+              <span>{{loan.customer?.firstName}} {{loan.customer?.lastName}}</span>
+            </div>
+            <div class="info-item">
+              <strong>Monto Original:</strong>
+              <span>{{loan.amount | currency:'MXN':'symbol':'1.0-0'}}</span>
+            </div>
+            <div class="info-item">
+              <strong>Saldo Actual:</strong>
+              <span>{{loan.currentBalance | currency:'MXN':'symbol':'1.0-0'}}</span>
+            </div>
+            @if (loan.accumulatedOverdueAmount > 0) {
+              <div class="info-item">
+                <strong>Adeudo Acumulado:</strong>
+                <span style="color: red; font-weight: bold;">{{loan.accumulatedOverdueAmount | currency:'MXN':'symbol':'1.0-0'}}</span>
+              </div>
+            }
+            @if (loan.overduePeriodsCount > 0) {
+              <div class="info-item">
+                <strong>Períodos con Adeudo:</strong>
+                <span style="color: red; font-weight: bold;">{{loan.overduePeriodsCount}} {{loan.overduePeriodsUnit}}</span>
+              </div>
+            }
+            <div class="info-item">
+              <strong>Fecha de Inicio:</strong>
+              <span>{{loan.loanDate | date:'dd/MM/yyyy'}}</span>
+            </div>
+            <div class="info-item">
+              <strong>Tipo de Préstamo:</strong>
+              <span>{{loan.loanType}}</span>
+            </div>
+            @if (loan.loanType === 'Indefinido') {
+              <div class="info-item">
+                <strong>Progreso:</strong>
+                <span>{{loan.monthsPaid || 0}}/Indefinido</span>
+              </div>
+            } @else if (loan.loanType === 'Cápsula') {
+              <div class="info-item">
+                <strong>Progreso:</strong>
+                <span>{{loan.monthsPaid || 0}} / {{loan.term}} {{loan.modality || 'quincenas'}}</span>
+              </div>
+            }
+            <div class="info-item">
+              <strong>
+                Pago Estimado por Periodo:
+              </strong>
+              <span>{{getEstimatedPayment() | currency:'MXN':'symbol':'1.0-0'}}</span>
+            </div>
+            <div class="info-item">
+              <strong>Tasa de Interés:</strong>
+              <span>{{loan.monthlyInterestRate}}%</span>
+            </div>
+            <div class="info-item">
+              <strong>Total Pagado:</strong>
+              <span style="color: #4caf50; font-weight: bold;">{{getTotalPaid() | currency:'MXN':'symbol':'1.0-0'}}</span>
+            </div>
+            <div class="info-item" style="padding-left: 20px;">
+              <strong>• Interés:</strong>
+              <span>{{loan.totalInterestPaid | currency:'MXN':'symbol':'1.0-0'}}</span>
+            </div>
+            <div class="info-item" style="padding-left: 20px;">
+              <strong>• Capital:</strong>
+              <span>{{loan.totalCapitalPaid | currency:'MXN':'symbol':'1.0-0'}}</span>
+            </div>
+            @if (loan.totalExtraChargesPaid && loan.totalExtraChargesPaid > 0) {
+              <div class="info-item" style="padding-left: 20px;">
+                <strong>• Cargos Extra:</strong>
+                <span style="color: #ff9800;">{{loan.totalExtraChargesPaid | currency:'MXN':'symbol':'1.0-0'}}</span>
+              </div>
+            }
+            <div class="info-item">
+              <strong>Último Pago:</strong>
+              <span>{{loan.lastPaymentDate ? (loan.lastPaymentDate | date:'dd/MM/yyyy') : 'N/A'}}</span>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      
+    </div>
+  }
+</div>
+
+<div align="end">
+  <button mat-button (click)="goBack()">Cerrar</button>
+</div>

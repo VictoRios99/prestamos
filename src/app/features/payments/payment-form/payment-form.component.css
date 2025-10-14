@@ -1,0 +1,152 @@
+.payments-container {
+  padding: 20px;
+}
+
+.payment-form-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+.loan-details-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.loan-info-card {
+  padding: 16px;
+}
+
+.three-column-info-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+@media (min-width: 768px) {
+  .three-column-info-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.info-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px; /* Increased spacing */
+  font-size: 1rem;
+}
+
+.info-item mat-icon {
+  margin-right: 12px;
+  color: #3f51b5; /* Indigo color */
+}
+
+.centered-title {
+  text-align: center;
+}
+
+.centered-title mat-card-title {
+  display: block; /* Ensure it takes full width to center */
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #3f51b5;
+}
+
+.bold-text {
+  font-weight: bold;
+  color: #3f51b5;
+}
+
+.highlight-payment {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #3f51b5;
+}
+
+.text-success {
+  color: #28a745;
+  font-weight: bold;
+}
+
+.text-primary {
+  color: #007bff;
+  font-weight: bold;
+}
+
+.text-info {
+  color: #17a2b8;
+}
+
+.two-column-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.full-width-field {
+  grid-column: 1 / -1;
+}
+
+.custom-error {
+  text-align: center;
+  margin-top: -10px;
+  margin-bottom: 10px;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.payment-history {
+  margin-top: 24px;
+}
+
+.history-list {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.payment-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+}
+
+.payment-item:last-child {
+  border-bottom: none;
+}
+
+.payment-date {
+  font-weight: 500;
+}
+
+.payment-amount {
+  font-weight: bold;
+  color: #3f51b5;
+}
+
+.payment-breakdown {
+  color: #666;
+}
+
+.payment-method {
+  font-style: italic;
+  color: #888;
+}
+
+.extra-charge {
+  color: #ff9800;
+  font-weight: 600;
+}
+
+.warn-text {
+  color: #f44336;
+  font-weight: 500;
+}

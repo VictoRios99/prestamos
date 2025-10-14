@@ -1,0 +1,11 @@
+.completed-loans-container {
+  padding: 20px;
+}
+
+.full-width-table {
+  width: 100%;
+}
+
+mat-card-title {
+  margin-bottom: 20px;
+}

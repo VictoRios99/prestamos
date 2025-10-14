@@ -1,0 +1,99 @@
+<h2 mat-dialog-title>Carga Masiva de Clientes</h2>
+
+<mat-dialog-content>
+  <div class="upload-container">
+    <div class="info-section">
+      <mat-icon color="primary">info</mat-icon>
+      <div>
+        <p>
+          El archivo Excel debe contener las siguientes columnas:<br>
+          <strong>Nombre, Apellidos, Teléfono, Email, Dirección</strong>
+        </p>
+        <p class="normalization-info">
+          <mat-icon class="info-icon">check_circle</mat-icon>
+          Los nombres, apellidos y direcciones pueden estar en MAYÚSCULAS o minúsculas.
+          El sistema automáticamente eliminará acentos, virgulillas (ñ) y caracteres especiales,
+          y aplicará capitalización correcta.
+        </p>
+      </div>
+      <button mat-stroked-button color="primary" (click)="downloadTemplate()">
+        <mat-icon>download</mat-icon>
+        Descargar Plantilla
+      </button>
+    </div>
+
+    <div class="file-input-section">
+      <input
+        type="file"
+        #fileInput
+        (change)="onFileSelected($event)"
+        accept=".xlsx,.xls"
+        style="display: none"
+      >
+
+      <button
+        mat-raised-button
+        color="primary"
+        (click)="fileInput.click()"
+        [disabled]="uploading"
+      >
+        <mat-icon>folder_open</mat-icon>
+        Seleccionar Archivo
+      </button>
+
+      <div class="selected-file" *ngIf="selectedFile">
+        <mat-icon>description</mat-icon>
+        <span>{{ selectedFile.name }}</span>
+      </div>
+    </div>
+
+    <div class="upload-spinner" *ngIf="uploading">
+      <mat-spinner diameter="50"></mat-spinner>
+      <p>Procesando archivo...</p>
+    </div>
+
+    <div class="upload-results" *ngIf="uploadResult">
+      <h3>Resultados de la Carga</h3>
+      <div class="results-summary">
+        <div class="result-item success">
+          <mat-icon>check_circle</mat-icon>
+          <span>Exitosos: {{ uploadResult.success }}</span>
+        </div>
+        <div class="result-item error" *ngIf="uploadResult.failed > 0">
+          <mat-icon>error</mat-icon>
+          <span>Fallidos: {{ uploadResult.failed }}</span>
+        </div>
+      </div>
+
+      <div class="error-details" *ngIf="uploadResult.errors && uploadResult.errors.length > 0">
+        <h4>Detalles de Errores:</h4>
+        <mat-list>
+          <mat-list-item *ngFor="let error of uploadResult.errors">
+            <div class="error-item">
+              <strong>Fila {{ error.row }}: {{ error.name }}</strong>
+              <ul>
+                <li *ngFor="let msg of error.errors">{{ msg }}</li>
+              </ul>
+            </div>
+          </mat-list-item>
+        </mat-list>
+      </div>
+    </div>
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="close()" [disabled]="uploading">
+    {{ uploadResult ? 'Cerrar' : 'Cancelar' }}
+  </button>
+  <button
+    mat-raised-button
+    color="primary"
+    (click)="uploadFile()"
+    [disabled]="!selectedFile || uploading"
+    *ngIf="!uploadResult"
+  >
+    <mat-icon>cloud_upload</mat-icon>
+    Cargar Archivo
+  </button>
+</mat-dialog-actions>

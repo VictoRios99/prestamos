@@ -1,0 +1,51 @@
+<!-- src/app/features/customers/customer-form/customer-form.component.html -->
+<h2 mat-dialog-title>{{ isEdit ? 'Editar' : 'Nuevo' }} Cliente</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="customerForm">
+    <div class="form-grid">
+      <mat-form-field appearance="outline">
+        <mat-label>Nombre</mat-label>
+        <input matInput formControlName="firstName" placeholder="Nombre" (input)="onInputUppercase($event, 'firstName')">
+        <mat-error *ngIf="customerForm.get('firstName')?.hasError('required')">
+          El nombre es requerido
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Apellido</mat-label>
+        <input matInput formControlName="lastName" placeholder="Apellido" (input)="onInputUppercase($event, 'lastName')">
+        <mat-error *ngIf="customerForm.get('lastName')?.hasError('required')">
+          El apellido es requerido
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Teléfono</mat-label>
+        <input matInput formControlName="phone" placeholder="Teléfono">
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Email</mat-label>
+        <input matInput formControlName="email" placeholder="email@ejemplo.com" (input)="onInputUppercase($event, 'email')">
+        <mat-error *ngIf="customerForm.get('email')?.hasError('email')">
+          Email inválido
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Dirección</mat-label>
+        <textarea matInput formControlName="address" placeholder="Dirección completa" rows="2" (input)="onInputUppercase($event, 'address')"></textarea>
+      </mat-form-field>
+    </div>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Cancelar</button>
+  <button mat-raised-button color="primary" (click)="onSubmit()"
+          [disabled]="customerForm.invalid || loading">
+    <mat-spinner diameter="20" *ngIf="loading"></mat-spinner>
+    {{ loading ? '' : (isEdit ? 'Actualizar' : 'Guardar') }}
+  </button>
+</mat-dialog-actions>

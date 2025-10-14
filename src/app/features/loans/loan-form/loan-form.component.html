@@ -1,0 +1,100 @@
+<h2 mat-dialog-title>Nuevo Préstamo</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="loanForm">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Cliente</mat-label>
+      <mat-select formControlName="customerId">
+        @for (customer of customers; track customer.id) {
+          <mat-option [value]="customer.id">
+            {{customer.firstName}} {{customer.lastName}}
+          </mat-option>
+        }
+      </mat-select>
+      @if (loanForm.get('customerId')?.hasError('required')) {
+        <mat-error>El cliente es requerido</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Fecha del préstamo</mat-label>
+      <input matInput [matDatepicker]="picker" formControlName="loanDate">
+      <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-datepicker #picker></mat-datepicker>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Monto</mat-label>
+      <input matInput type="number" formControlName="amount" placeholder="0" step="1">
+      @if (loanForm.get('amount')?.hasError('required')) {
+        <mat-error>El monto es requerido</mat-error>
+      }
+      @if (loanForm.get('amount')?.hasError('min')) {
+        <mat-error>El monto debe ser mayor a 0</mat-error>
+      }
+    </mat-form-field>
+
+    <!-- New loanType input -->
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Tipo de Préstamo</mat-label>
+      <mat-select formControlName="loanType">
+        <mat-option value="Cápsula">Cápsula</mat-option>
+        <mat-option value="Indefinido">Indefinido</mat-option>
+      </mat-select>
+      @if (loanForm.get('loanType')?.hasError('required')) {
+        <mat-error>El tipo de préstamo es requerido</mat-error>
+      }
+    </mat-form-field>
+
+    <!-- Conditional Modality and Terms inputs -->
+    @if (loanForm.get('loanType')?.value === 'Cápsula') {
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Modalidad</mat-label>
+        <mat-select formControlName="modality">
+          <mat-option value="quincenas">Quincenal</mat-option>
+          <mat-option value="meses">Mensual</mat-option>
+        </mat-select>
+        @if (loanForm.get('modality')?.hasError('required')) {
+          <mat-error>La modalidad es requerida</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Plazos</mat-label>
+        <mat-select formControlName="terms">
+          <mat-option [value]="8">8</mat-option>
+          <mat-option [value]="16">16</mat-option>
+          <mat-option [value]="24">24</mat-option>
+        </mat-select>
+        @if (loanForm.get('terms')?.hasError('required')) {
+          <mat-error>Los plazos son requeridos</mat-error>
+        }
+      </mat-form-field>
+    }
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Tasa de Interés Mensual (%)</mat-label>
+      <input matInput type="number" formControlName="monthlyInterestRate" placeholder="5">
+      @if (loanForm.get('monthlyInterestRate')?.hasError('required')) {
+        <mat-error>La tasa de interés es requerida</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Notas</mat-label>
+      <textarea matInput formControlName="notes" rows="3" (input)="onInputUppercase($event, 'notes')"></textarea>
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()" [disabled]="loading">Cancelar</button>
+  <button mat-raised-button color="primary" (click)="onSubmit()"
+          [disabled]="loanForm.invalid || loading">
+    @if (loading) {
+      <mat-spinner diameter="20"></mat-spinner>
+    } @else {
+      Guardar
+    }
+  </button>
+</mat-dialog-actions>

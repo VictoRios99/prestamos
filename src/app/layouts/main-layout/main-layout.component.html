@@ -1,0 +1,64 @@
+<mat-drawer-container class="container">
+  <mat-drawer #drawer mode="side" opened class="sidenav">
+    <mat-nav-list>
+      <h3 mat-subheader>Sistema de Préstamos</h3>
+      
+      <a mat-list-item routerLink="/dashboard" routerLinkActive="active">
+        <mat-icon matListItemIcon>dashboard</mat-icon>
+        <span matListItemTitle>Dashboard</span>
+      </a>
+      
+      <a mat-list-item routerLink="/customers" routerLinkActive="active">
+        <mat-icon matListItemIcon>people</mat-icon>
+        <span matListItemTitle>Clientes</span>
+      </a>
+      
+      <a mat-list-item routerLink="/loans" routerLinkActive="active">
+        <mat-icon matListItemIcon>account_balance_wallet</mat-icon>
+        <span matListItemTitle>Préstamos</span>
+      </a>
+      
+      <a mat-list-item routerLink="/payments" routerLinkActive="active">
+        <mat-icon matListItemIcon>payment</mat-icon>
+        <span matListItemTitle>Pagos</span>
+      </a>
+
+      <a mat-list-item routerLink="/completed-loans" routerLinkActive="active">
+        <mat-icon matListItemIcon>history</mat-icon>
+        <span matListItemTitle>Historial de Préstamos Completados</span>
+      </a>
+      
+      @if ((user$ | async)?.role === 'SUPER_ADMIN') {
+        <a mat-list-item routerLink="/reports" routerLinkActive="active">
+          <mat-icon matListItemIcon>assessment</mat-icon>
+          <span matListItemTitle>Reportes</span>
+        </a>
+      }
+    </mat-nav-list>
+  </mat-drawer>
+  
+  <mat-drawer-content>
+    <mat-toolbar color="primary">
+      <button mat-icon-button (click)="drawer.toggle()">
+        <mat-icon>menu</mat-icon>
+      </button>
+      <span class="spacer"></span>
+      @if (user$ | async; as user) {
+        <span>{{ user.fullName }}</span>
+      }
+      <button mat-icon-button [matMenuTriggerFor]="menu">
+        <mat-icon>account_circle</mat-icon>
+      </button>
+      <mat-menu #menu="matMenu">
+        <button mat-menu-item (click)="logout()">
+          <mat-icon>exit_to_app</mat-icon>
+          <span>Cerrar Sesión</span>
+        </button>
+      </mat-menu>
+    </mat-toolbar>
+    
+    <div class="content">
+      <router-outlet></router-outlet>
+    </div>
+  </mat-drawer-content>
+</mat-drawer-container>

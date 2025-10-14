@@ -1,0 +1,168 @@
+<div class="reports-container">
+  <h1>Centro de Reportes</h1>
+
+  <div class="reports-grid">
+    <mat-card class="report-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>account_balance</mat-icon>
+          Exportar Préstamos
+        </mat-card-title>
+        <mat-card-subtitle>Descarga todos los préstamos registrados</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <p>Incluye información completa de todos los préstamos del sistema con detalles de clientes, montos, saldos y estados.</p>
+        <ul>
+          <li>Datos completos de préstamos</li>
+          <li>Información de clientes</li>
+          <li>Saldos actualizados</li>
+          <li>Estados de pagos</li>
+        </ul>
+      </mat-card-content>
+      <mat-card-actions>
+        <button mat-raised-button color="primary" (click)="exportLoans()" [disabled]="loading">
+          <mat-icon>download</mat-icon>
+          Descargar Excel
+        </button>
+      </mat-card-actions>
+    </mat-card>
+
+    <mat-card class="report-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>payment</mat-icon>
+          Exportar Pagos del Último Mes
+        </mat-card-title>
+        <mat-card-subtitle>Pagos del último mes con análisis detallado</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <p>Reporte completo de todos los pagos realizados en el último mes, incluyendo desglose de intereses y capital.</p>
+        <ul>
+          <li>Pagos por fecha</li>
+          <li>Desglose interés/capital</li>
+          <li>Información de clientes</li>
+          <li>Hoja de resumen y estadísticas</li>
+        </ul>
+      </mat-card-content>
+      <mat-card-actions>
+        <button mat-raised-button color="accent" (click)="exportPaymentsLastMonth()" [disabled]="loading">
+          <mat-icon>download</mat-icon>
+          Descargar Excel
+        </button>
+      </mat-card-actions>
+    </mat-card>
+
+    <mat-card class="report-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>all_inclusive</mat-icon>
+          Exportar TODOS los Pagos
+        </mat-card-title>
+        <mat-card-subtitle>Todos los pagos registrados, pasados y futuros</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <p>Genera un reporte con todos los pagos registrados en el sistema, sin importar la fecha.</p>
+        <ul>
+          <li>Todos los pagos históricos</li>
+          <li>Pagos con fecha futura</li>
+          <li>Análisis completo</li>
+          <li>Hoja de resumen y estadísticas</li>
+        </ul>
+      </mat-card-content>
+      <mat-card-actions>
+        <button mat-raised-button color="primary" (click)="exportAllPayments()" [disabled]="loading">
+          <mat-icon>download</mat-icon>
+          Descargar Excel
+        </button>
+      </mat-card-actions>
+    </mat-card>
+
+    <mat-card class="report-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>date_range</mat-icon>
+          Pagos por Rango de Fechas
+        </mat-card-title>
+        <mat-card-subtitle>Reporte personalizado de pagos</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <p>Genera un reporte de pagos para un período específico que tú selecciones.</p>
+        <ul>
+          <li>Selección de fechas personalizada</li>
+          <li>Análisis por período</li>
+          <li>Métricas específicas del rango</li>
+          <li>Comparativas temporales</li>
+        </ul>
+      </mat-card-content>
+      <mat-card-actions>
+        <button mat-raised-button color="warn" (click)="exportPaymentsCustomRange()" [disabled]="loading">
+          <mat-icon>calendar_today</mat-icon>
+          Seleccionar Fechas
+        </button>
+      </mat-card-actions>
+    </mat-card>
+
+    <mat-card class="report-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>calendar_month</mat-icon>
+          Pagos por Mes
+        </mat-card-title>
+        <mat-card-subtitle>Reporte de pagos para un mes específico</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <p>Genera un reporte de pagos para un mes y año que tú selecciones.</p>
+        <ul>
+          <li>Selección de mes y año</li>
+          <li>Análisis mensual</li>
+          <li>Métricas específicas del mes</li>
+        </ul>
+      </mat-card-content>
+      <mat-card-actions>
+        <button mat-raised-button color="primary" (click)="exportPaymentsByMonth()" [disabled]="loading">
+          <mat-icon>calendar_today</mat-icon>
+          Seleccionar Mes
+        </button>
+      </mat-card-actions>
+    </mat-card>
+
+    <mat-card class="report-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>assessment</mat-icon>
+          Reporte Mensual Completo
+        </mat-card-title>
+        <mat-card-subtitle>Análisis integral del mes actual</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <p>Reporte ejecutivo completo con todas las métricas, análisis de rendimiento y proyecciones.</p>
+        <ul>
+          <li>Dashboard completo</li>
+          <li>Análisis de morosidad</li>
+          <li>Proyecciones financieras</li>
+          <li>Recomendaciones</li>
+        </ul>
+      </mat-card-content>
+      <mat-card-actions>
+        <button mat-raised-button color="primary" (click)="exportMonthlyReport()" [disabled]="loading">
+          <mat-icon>trending_up</mat-icon>
+          Generar Reporte
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+
+  @if (loading) {
+    <div class="loading-overlay">
+      <mat-card>
+        <mat-card-content>
+          <div class="loading-content">
+            <mat-spinner diameter="50"></mat-spinner>
+            <p>Generando reporte...</p>
+            <small>Por favor espera mientras procesamos la información</small>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  }
+</div>

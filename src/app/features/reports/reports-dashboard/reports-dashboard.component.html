@@ -1,0 +1,78 @@
+<div class="reports-container">
+  <h1>Reportes</h1>
+
+  <div class="reports-grid">
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>Exportar Préstamos</mat-card-title>
+        <mat-card-subtitle>Descarga todos los préstamos en formato Excel</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <p>Incluye información detallada de todos los préstamos registrados en el sistema.</p>
+      </mat-card-content>
+      <mat-card-actions>
+        <button mat-raised-button color="primary" (click)="exportLoans()">
+          <mat-icon>download</mat-icon>
+          Descargar Excel
+        </button>
+      </mat-card-actions>
+    </mat-card>
+
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>Exportar Pagos</mat-card-title>
+        <mat-card-subtitle>Descarga los pagos del último mes</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <p>Incluye todos los pagos realizados en los últimos 30 días.</p>
+      </mat-card-content>
+      <mat-card-actions>
+        <button mat-raised-button color="accent" (click)="exportPayments()">
+          <mat-icon>download</mat-icon>
+          Descargar Excel
+        </button>
+      </mat-card-actions>
+    </mat-card>
+
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>Pagos por Mes</mat-card-title>
+        <mat-card-subtitle>Descarga los pagos de un mes específico</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <p>Selecciona un mes y año para generar un reporte de pagos.</p>
+      </mat-card-content>
+      <mat-card-actions>
+        <button mat-raised-button color="warn" (click)="exportPaymentsByMonth()">
+          <mat-icon>calendar_month</mat-icon>
+          Seleccionar Mes
+        </button>
+      </mat-card-actions>
+    </mat-card>
+
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>all_inclusive</mat-icon>
+          Exportar TODOS los Pagos
+        </mat-card-title>
+        <mat-card-subtitle>Todos los pagos registrados, pasados y futuros</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <p>Genera un reporte con todos los pagos registrados en el sistema, sin importar la fecha.</p>
+        <ul>
+          <li>Todos los pagos históricos</li>
+          <li>Pagos con fecha futura</li>
+          <li>Análisis completo</li>
+          <li>Hoja de resumen y estadísticas</li>
+        </ul>
+      </mat-card-content>
+      <mat-card-actions>
+        <button mat-raised-button color="primary" (click)="exportAllPayments()">
+          <mat-icon>download</mat-icon>
+          Descargar Excel
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+</div>

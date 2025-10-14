@@ -1,0 +1,103 @@
+<!-- src/app/features/dashboard/dashboard/dashboard.component.html -->
+<div class="dashboard-container">
+  <h1>Dashboard</h1>
+
+  @if (summary && !loading) {
+    <div class="stats-grid">
+      <mat-card class="stat-card">
+        <mat-card-content>
+          <div class="stat-icon">
+            <mat-icon>attach_money</mat-icon>
+          </div>
+          <div class="stat-info">
+            <h3>Dinero Prestado</h3>
+            <p class="stat-value">{{ summary.totalLoaned | currency }}</p>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stat-card">
+        <mat-card-content>
+          <div class="stat-icon">
+            <mat-icon>account_balance</mat-icon>
+          </div>
+          <div class="stat-info">
+            <h3>Capital Recuperado</h3>
+            <p class="stat-value">{{ summary.capitalRecovered | currency }}</p>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stat-card">
+        <mat-card-content>
+          <div class="stat-icon">
+            <mat-icon>trending_up</mat-icon>
+          </div>
+          <div class="stat-info">
+            <h3>Interés Recabado</h3>
+            <p class="stat-value">{{ summary.interestCollected | currency }}</p>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stat-card">
+        <mat-card-content>
+          <div class="stat-icon">
+            <mat-icon>sync</mat-icon>
+          </div>
+          <div class="stat-info">
+            <h3>Capital en Tránsito</h3>
+            <p class="stat-value">{{ summary.capitalInTransit | currency }}</p>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stat-card">
+        <mat-card-content>
+          <div class="stat-icon">
+            <mat-icon>calendar_today</mat-icon>
+          </div>
+          <div class="stat-info">
+            <h3>Interés Mensual</h3>
+            <p class="stat-value">{{ summary.monthlyInterest | currency }}</p>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stat-card warn">
+        <mat-card-content>
+          <div class="stat-icon">
+            <mat-icon>warning</mat-icon>
+          </div>
+          <div class="stat-info">
+            <h3>Préstamos Sin Pagar</h3>
+            <p class="stat-value">{{ summary.overdueCount }}</p>
+            <small>Monto: {{ summary.overdueAmount | currency }}</small>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <div class="additional-stats">
+      <mat-card>
+        <mat-card-header>
+          <mat-card-title>Estadísticas de Préstamos</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="stat-row">
+            <span>Préstamos Activos:</span>
+            <strong>{{ summary.activeLoans }}</strong>
+          </div>
+          <div class="stat-row">
+            <span>Total de Préstamos:</span>
+            <strong>{{ summary.totalLoans }}</strong>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  }
+
+  @if (loading) {
+    <mat-spinner class="loading-spinner"></mat-spinner>
+  }
+</div>

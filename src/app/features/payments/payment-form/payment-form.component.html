@@ -1,0 +1,277 @@
+<div class="payments-container">
+  <h1>Registrar Pago</h1>
+
+  <mat-card>
+    <mat-card-content>
+      <form [formGroup]="paymentForm" (ngSubmit)="onSubmit()">
+        <div class="payment-form-layout">
+          <mat-form-field appearance="outline" class="full-width-field">
+            <mat-label>Buscar Préstamo</mat-label>
+            <input type="text" matInput formControlName="loanSearchControl" [matAutocomplete]="auto">
+            <mat-autocomplete #auto="matAutocomplete" (optionSelected)="onLoanSelect($event.option.value)">
+              @for (loan of filteredLoans | async; track loan.id) {
+                <mat-option [value]="loan.id">
+                  #{{loan.id}} - {{loan.customer?.firstName}} {{loan.customer?.lastName}} - {{loan.amount | currency:'MXN':'symbol':'1.0-0'}}
+                </mat-option>
+              }
+            </mat-autocomplete>
+            @if (paymentForm.get('loanId')?.hasError('required')) {
+              <mat-error>El préstamo es requerido</mat-error>
+            }
+          </mat-form-field>
+
+          @if (selectedLoan) {
+            <div class="loan-details-grid">
+              <mat-card class="loan-info-card full-width-field">
+                <mat-card-header class="centered-title">
+                  <mat-card-title>Información General del Préstamo</mat-card-title>
+                </mat-card-header>
+                <mat-card-content>
+                  <div class="three-column-info-grid">
+                    <!-- Column 1 -->
+                    <div>
+                      <div class="info-item">
+                        <mat-icon>person</mat-icon>
+                        <span>Cliente: {{selectedLoan.customer?.firstName}} {{selectedLoan.customer?.lastName}}</span>
+                      </div>
+                      <div class="info-item">
+                        <mat-icon>monetization_on</mat-icon>
+                        <span>Monto Original: {{selectedLoan.amount | currency:'MXN':'symbol':'1.0-0'}}</span>
+                      </div>
+                      <div class="info-item">
+                        <mat-icon>account_balance_wallet</mat-icon>
+                        <span [class]="getParsedCurrentBalance(selectedLoan.currentBalance) <= 0 ? 'text-success' : 'text-primary'">
+                          Saldo Actual: {{(selectedLoan.currentBalance || 0) | currency:'MXN':'symbol':'1.0-0'}}
+                        </span>
+                      </div>
+                      <div class="info-item">
+                        <mat-icon>event</mat-icon>
+                        <span>Fecha de Inicio: {{selectedLoan.loanDate | date:'dd/MM/yyyy'}}</span>
+                      </div>
+                    </div>
+
+                    <!-- Column 2 -->
+                    <div>
+                      @if (selectedLoan.loanType === 'Cápsula') {
+                        <div class="info-item">
+                          <mat-icon>trending_up</mat-icon>
+                          <span>Progreso: {{ (selectedLoan.monthsPaid || 0) + ' / ' + selectedLoan.term + ' ' + selectedLoan.modality }}</span>
+                        </div>
+                      } @else {
+                        <div class="info-item">
+                          <mat-icon>trending_up</mat-icon>
+                          <span>Progreso: {{ (selectedLoan.monthsPaid || 0) + ' / ' + selectedLoan.loanType }}</span>
+                        </div>
+                      }
+                      @if (projection) {
+                        <div class="info-item">
+                          <mat-icon>percent</mat-icon>
+                          <span>Tasa de Interés: {{projection.monthlyInterestRate}}%</span>
+                        </div>
+                        <div class="info-item">
+                          <mat-icon>category</mat-icon>
+                          <span>Tipo de Préstamo: {{projection.loanType}}</span>
+                        </div>
+                        <div class="info-item">
+                          <mat-icon>schedule</mat-icon>
+                          <span>Frecuencia de Pago: {{projection.paymentFrequency}}</span>
+                        </div>
+                      }
+                    </div>
+
+                    <!-- Column 3 -->
+                    <div>
+                      <div class="info-item">
+                        <mat-icon>payments</mat-icon>
+                        <span style="color: #4caf50; font-weight: bold;">Total Pagado: {{getLoanTotalPaid() | currency:'MXN':'symbol':'1.0-0'}}</span>
+                      </div>
+                      <div class="info-item" style="padding-left: 32px;">
+                        <span style="font-size: 0.9em;">• Interés: {{selectedLoan.totalInterestPaid | currency:'MXN':'symbol':'1.0-0'}}</span>
+                      </div>
+                      <div class="info-item" style="padding-left: 32px;">
+                        <span style="font-size: 0.9em;">• Capital: {{selectedLoan.totalCapitalPaid | currency:'MXN':'symbol':'1.0-0'}}</span>
+                      </div>
+                      @if (selectedLoan.totalExtraChargesPaid && selectedLoan.totalExtraChargesPaid > 0) {
+                        <div class="info-item" style="padding-left: 32px;">
+                          <span style="font-size: 0.9em; color: #ff9800;">• Cargos Extra: {{selectedLoan.totalExtraChargesPaid | currency:'MXN':'symbol':'1.0-0'}}</span>
+                        </div>
+                      }
+                      <div class="info-item">
+                        <mat-icon>calendar_today</mat-icon>
+                        <span>Último Pago: {{selectedLoan.lastPaymentDate ? (selectedLoan.lastPaymentDate | date) : 'N/A'}}</span>
+                      </div>
+                      @if (selectedLoan.overduePeriodsCount && selectedLoan.overduePeriodsCount > 0) {
+                        <div class="info-item">
+                            <mat-icon color="warn">warning</mat-icon>
+                            <span class="warn-text">
+                                Periodos Vencidos: {{selectedLoan.overduePeriodsCount}} {{selectedLoan.overduePeriodsUnit}}
+                            </span>
+                        </div>
+                      }
+                      @if (selectedLoan.accumulatedOverdueAmount && selectedLoan.accumulatedOverdueAmount > 0) {
+                        <div class="info-item">
+                            <mat-icon color="warn">error</mat-icon>
+                            <span class="warn-text">
+                                Adeudo Acumulado: {{selectedLoan.accumulatedOverdueAmount | currency:'MXN':'symbol':'1.0-0'}}
+                            </span>
+                        </div>
+                      }
+                      @if (projection) {
+                        <div class="info-item highlight-payment">
+                          <mat-icon>payments</mat-icon>
+                          <span>
+                            Pago por Periodo:
+                            @if (projection.loanType === 'Indefinido') {
+                              {{indefinidoCalculatedInterest | currency:'MXN':'symbol':'1.0-0'}}
+                            } @else {
+                              {{projection.estimatedPayment | currency:'MXN':'symbol':'1.0-0'}}
+                            }
+                          </span>
+                        </div>
+                      }
+                    </div>
+                  </div>
+                </mat-card-content>
+              </mat-card>
+            </div>
+          }
+
+          @if (selectedLoan && selectedLoan.overduePeriodsCount && selectedLoan.overduePeriodsCount > 0) {
+            <mat-form-field appearance="outline" class="full-width-field">
+              <mat-label>Pagar Periodos Vencidos</mat-label>
+              <mat-select formControlName="overduePeriodsToPay">
+                @for (i of getOverduePeriodOptions(); track i) {
+                  <mat-option [value]="i">{{ i === 0 ? '0 (Pago regular)' : i }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+          }
+
+          <mat-form-field appearance="outline" class="full-width-field">
+            <mat-label>Fecha de pago</mat-label>
+            <input matInput [matDatepicker]="paymentPicker" formControlName="paymentDate">
+            <mat-datepicker-toggle matIconSuffix [for]="paymentPicker"></mat-datepicker-toggle>
+            <mat-datepicker #paymentPicker></mat-datepicker>
+            @if (paymentForm.hasError('paymentDateBeforeLoanDate')) {
+              <mat-error>La fecha de pago no puede ser anterior a la fecha de inicio del préstamo.</mat-error>
+            }
+          </mat-form-field>
+
+          @if (selectedLoan?.loanType === 'Indefinido') {
+            <div class="two-column-row">
+              <mat-form-field appearance="outline">
+                <mat-label>Abono a Capital</mat-label>
+                <input matInput type="number" formControlName="capitalAmount" placeholder="0" step="1">
+                @if (paymentForm.get('capitalAmount')?.hasError('min')) {
+                  <mat-error>El monto debe ser 0 o mayor</mat-error>
+                }
+                @if (paymentForm.get('capitalAmount')?.hasError('max')) {
+                  <mat-error>El abono a capital no puede exceder el saldo actual.</mat-error>
+                }
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Pago de Interés</mat-label>
+                <input matInput type="number" formControlName="interestAmount" placeholder="0" step="1">
+                @if (paymentForm.get('interestAmount')?.hasError('min')) {
+                  <mat-error>El monto debe ser 0 o mayor</mat-error>
+                }
+                @if (paymentForm.get('interestAmount')?.hasError('required')) {
+                  <mat-error>El pago de interés es requerido</mat-error>
+                }
+              </mat-form-field>
+            </div>
+          } @else {
+            <mat-form-field appearance="outline" class="full-width-field">
+              <mat-label>Monto de Pago</mat-label>
+              <input matInput type="number" formControlName="amount" placeholder="0" step="1"
+                     [readonly]="isAmountReadonly">
+              @if (paymentForm.get('amount')?.hasError('required')) {
+                <mat-error>El monto de pago es requerido</mat-error>
+              }
+              @if (paymentForm.get('amount')?.hasError('min')) {
+                <mat-error>El monto debe ser 0 o mayor</mat-error>
+              }
+            </mat-form-field>
+          }
+
+          <mat-form-field appearance="outline" class="full-width-field">
+            <mat-label>Cargo Extra (Opcional)</mat-label>
+            <input matInput type="number" formControlName="lateInterest" placeholder="0" step="1">
+            @if (paymentForm.get('lateInterest')?.hasError('min')) {
+              <mat-error>El monto debe ser 0 o mayor</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width-field">
+            <mat-label>Método de pago</mat-label>
+            <mat-select formControlName="paymentMethod">
+              <mat-option value="CASH">Efectivo</mat-option>
+              <mat-option value="TRANSFER">Transferencia</mat-option>
+              <mat-option value="CHECK">Cheque</mat-option>
+              <mat-option value="OTHER">Otro</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width-field">
+            <mat-label>Notas</mat-label>
+            <textarea matInput formControlName="notes" rows="3" 
+                      placeholder="Comentarios adicionales sobre el pago..." (input)="onInputUppercase($event, 'notes')"></textarea>
+          </mat-form-field>
+        </div>
+
+        <div class="form-actions">
+          <button mat-raised-button type="button" (click)="resetForm()" 
+                  [disabled]="loading" class="mr-2">
+            <mat-icon>clear</mat-icon>
+            Limpiar
+          </button>
+          
+          <button mat-raised-button color="primary" type="submit"
+                  [disabled]="paymentForm.invalid || loading || !selectedLoan">
+            <mat-icon>save</mat-icon>
+            @if (loading) {
+              Procesando...
+            } @else {
+              Registrar Pago
+            }
+          </button>
+
+          
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+  @if (selectedLoan) {
+    <mat-card class="payment-history mt-3">
+      <mat-card-header>
+        <mat-card-title>Historial de Pagos</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        @if (paymentHistory.length > 0) {
+          <div class="history-list">
+            @for (payment of paymentHistory; track payment.id) {
+              <div class="payment-item">
+                <div class="payment-date">{{payment.paymentDate | date:'dd/MM/yyyy'}}</div>
+                <div class="payment-amount"><strong>Total: {{getPaymentTotal(payment) | currency:'MXN':'symbol':'1.0-0'}}</strong></div>
+                <div class="payment-breakdown">
+                  <small>Interés: {{payment.interestPaid | currency:'MXN':'symbol':'1.0-0'}} | Capital: {{payment.capitalPaid | currency:'MXN':'symbol':'1.0-0'}}</small>
+                  @if (payment.lateInterest && payment.lateInterest > 0) {
+                    <small class="extra-charge"> | Cargo Extra: {{payment.lateInterest | currency:'MXN':'symbol':'1.0-0'}}</small>
+                  }
+                </div>
+                <div class="payment-method">
+                  <small>{{payment.paymentMethod}} - {{payment.receiptNumber}}</small>
+                </div>
+              </div>
+            }
+          </div>
+        } @else {
+          <p class="text-muted">No hay pagos registrados para este préstamo</p>
+        }
+      </mat-card-content>
+    </mat-card>
+  }
+</div>
+
